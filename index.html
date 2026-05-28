@@ -344,6 +344,10 @@
                 if(doc.exists) {
                     const dados = doc.data();
                     document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                    if (dados.campeaoApostado && dados.pago === true) {
+    const cardCampeao = document.querySelector('.card[style*="var(--primary)"]');
+    if (cardCampeao) cardCampeao.style.display = 'none';
+}
                     
                     if(dados.campeaoApostado) document.getElementById('master-champion-select').value = dados.campeaoApostado;
                     
