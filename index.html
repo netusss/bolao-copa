@@ -612,7 +612,33 @@
                 if(salvo) carregarSessao(salvo);
             });
         };
+        // ... seu código anterior do window.onload ...
+    });
+}; // <-- linha 614
+
+// COLE O CÓDIGO DA IMPORTAÇÃO AQUI:
+const jogosParaCadastrar = [
+    { id: "jogo1", data: "11/06 - 20:00", time1: "México", time2: "África do Sul" },
+    { id: "jogo2", data: "11/06 - 20:00", time1: "Coreia do Sul", time2: "Rep. Tcheca" }
+];
+
+function importarTudo() {
+    jogosParaCadastrar.forEach(jogo => {
+        db.collection("jogos").doc(jogo.id).set({
+            ...jogo,
+            placarReal1: "",
+            placarReal2: "",
+            encerrado: false
+        });
+    });
+    alert("Importação concluída!");
+}
+
+</script> <!-- linha 615 -->
 </script>
       </a>
+<button onclick="importarTudo()" style="display: block; margin: 20px auto; padding: 10px; background: #00ff87; border: none; cursor: pointer;">
+    EXECUTAR IMPORTAÇÃO
+</button>
 </body>
 </html>
