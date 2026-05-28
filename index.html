@@ -71,75 +71,21 @@
             <input type="text" id="login-nome" placeholder="Seu Nome">
             <input type="tel" id="login-celular" placeholder="Celular (Ex: 75992637960)">
             <input type="text" id="login-apelido" placeholder="Seu Apelido">
-            <select id="master-champion-select" style="width: 100%; padding: 10px; border-radius: 5px; margin-top: 5px;">
-    <option value="">Escolha seu Campeão</option>
-    <option value="Alemanha">Alemanha</option>
-    <option value="Arábia Saudita">Arábia Saudita</option>
-    <option value="Argentina">Argentina</option>
-    <option value="Austrália">Austrália</option>
-    <option value="Bélgica">Bélgica</option>
-    <option value="Brasil">Brasil</option>
-    <option value="Camarões">Camarões</option>
-    <option value="Canadá">Canadá</option>
-    <option value="Coreia do Sul">Coreia do Sul</option>
-    <option value="Croácia">Croácia</option>
-    <option value="Dinamarca">Dinamarca</option>
-    <option value="Equador">Equador</option>
-    <option value="Espanha">Espanha</option>
-    <option value="Estados Unidos">Estados Unidos</option>
-    <option value="França">França</option>
-    <option value="Gana">Gana</option>
-    <option value="Holanda">Holanda</option>
-    <option value="Inglaterra">Inglaterra</option>
-    <option value="Irã">Irã</option>
-    <option value="Itália">Itália</option>
-    <option value="Japão">Japão</option>
-    <option value="Marrocos">Marrocos</option>
-    <option value="México">México</option>
-    <option value="Polônia">Polônia</option>
-    <option value="Portugal">Portugal</option>
-    <option value="Qatar">Qatar</option>
-    <option value="Senegal">Senegal</option>
-    <option value="Sérvia">Sérvia</option>
-    <option value="Suíça">Suíça</option>
-    <option value="Tunísia">Tunísia</option>
-    <option value="Uruguai">Uruguai</option>
-</select>
-      <script>
-// 1. Função de Login que cria o registro inicial
-function conectarUsuario() {
-    const nome = document.getElementById('login-nome').value;
-    const cel = document.getElementById('login-celular').value;
-    const apelido = document.getElementById('login-apelido').value;
+            <button class="btn-master" id="btn-entrar" onclick="conectarUsuario()">ENTRAR NO BOLÃO</button>
+        </section>
 
-    if(!nome || !cel || !apelido) return alert("Preencha todos os campos!");
+        <section id="games-screen" class="screen">
+            <h2 class="player-nickname" style="color: var(--primary); text-align: center; margin-bottom: 20px;">Bem-vindo</h2>
+            
+            <div class="card" style="border-color: var(--primary);">
+                <h3 style="color: var(--primary); margin-top: 0;">👑 Aposta Master</h3>
+                <label class="label-pequena">Quem será o grande Campeão do Mundo?</label>
+                <select id="master-champion-select">
+                    <option value="">Escolha a seleção campeã...</option>
+                </select>
+                <button class="btn-master" onclick="salvarApostaCampeao()">SALVAR CAMPEÃO (R$ 20,00)</button>
+            </div>
 
-    db.collection("usuarios").doc(cel).set({
-        nome: nome,
-        celular: cel,
-        apelido: apelido,
-        palpites: {}
-    }, {merge: true}).then(() => {
-        localStorage.setItem('bolao_user_celular', cel);
-        alert("Bem-vindo ao Bolão, " + apelido + "!");
-        location.reload();
-    });
-}
-
-// 2. Função que salva especificamente o campeão
-function salvarApostaCampeao() {
-    const campeao = document.getElementById('master-champion-select').value;
-    const cel = localStorage.getItem('bolao_user_celular');
-
-    if(!cel) return alert("Você precisa entrar no bolão primeiro!");
-    if(!campeao) return alert("Escolha uma seleção na lista!");
-
-    db.collection("usuarios").doc(cel).update({
-        campeaoApostado: campeao
-    }).then(() => {
-        alert("Palpite de Campeão salvo: " + campeao + "!");
-    }).catch(e => alert("Erro ao salvar: " + e.message));
-}
             <div id="pix-area" class="card">
                 <h3 style="color: var(--primary); margin: 0;">✅ Aposta Registrada!</h3>
                 <p>Para validar a sua participação, efetue o pagamento de <strong>R$ 20,00</strong>.</p>
