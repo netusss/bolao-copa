@@ -105,7 +105,8 @@
     <option value="Tunísia">Tunísia</option>
     <option value="Uruguai">Uruguai</option>
 </select>
-      // 1. Função de Login que cria o registro inicial
+      <script>
+// 1. Função de Login que cria o registro inicial
 function conectarUsuario() {
     const nome = document.getElementById('login-nome').value;
     const cel = document.getElementById('login-celular').value;
@@ -113,7 +114,6 @@ function conectarUsuario() {
 
     if(!nome || !cel || !apelido) return alert("Preencha todos os campos!");
 
-    // Salva o usuário no banco e armazena o celular no celular do usuário
     db.collection("usuarios").doc(cel).set({
         nome: nome,
         celular: cel,
@@ -122,7 +122,7 @@ function conectarUsuario() {
     }, {merge: true}).then(() => {
         localStorage.setItem('bolao_user_celular', cel);
         alert("Bem-vindo ao Bolão, " + apelido + "!");
-        location.reload(); // Recarrega para mostrar a tela dos jogos
+        location.reload();
     });
 }
 
@@ -138,10 +138,9 @@ function salvarApostaCampeao() {
         campeaoApostado: campeao
     }).then(() => {
         alert("Palpite de Campeão salvo: " + campeao + "!");
-        // Opcional: esconder o card de aposta após salvar
     }).catch(e => alert("Erro ao salvar: " + e.message));
 }
-
+</script>
             <div id="pix-area" class="card">
                 <h3 style="color: var(--primary); margin: 0;">✅ Aposta Registrada!</h3>
                 <p>Para validar a sua participação, efetue o pagamento de <strong>R$ 20,00</strong>.</p>
