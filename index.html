@@ -612,7 +612,24 @@
                 if(salvo) carregarSessao(salvo);
             });
         };
-       
+ <script>
+    function conectarUsuario() {
+        const nome = document.getElementById('login-nome').value;
+        const celular = document.getElementById('login-celular').value;
+        const apelido = document.getElementById('login-apelido').value;
+
+        if (!nome || !celular || !apelido) {
+            alert("Por favor, preencha todos os campos!");
+            return;
+        }
+
+        localStorage.setItem('bolao_user_celular', celular);
+        alert("Bem-vindo, " + apelido + "! Carregando o bolão...");
+        
+        // Se você tiver uma função que carrega a tela do bolão, chame ela aqui:
+        // carregarTelaDoBolao(); 
+    }
+</script>      
 
 </body>
     </html>
