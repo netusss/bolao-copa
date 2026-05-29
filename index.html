@@ -619,9 +619,9 @@
             const salvo = localStorage.getItem('bolao_user_celular');
             if(salvo) carregarSessao(salvo);
         });
-    }; // <--- FECHA O WINDOW.ONLOAD
+    }; // Fecha o window.onload
 
-    // A FUNÇÃO FICA AQUI, FORA DE TUDO:
+    // Esta função agora está LIVRE e FORA de qualquer outra função
     function conectarUsuario() {
         const btn = document.getElementById('btn-entrar');
         btn.innerText = "Conectando...";
@@ -632,7 +632,6 @@
             return alert("Preencha o celular!");
         }
 
-        // Certifique-se de que este fechamento existe:
         db.collection("usuarios").doc(celular).set({
             nome: document.getElementById('login-nome').value,
             apelido: document.getElementById('login-apelido').value
@@ -640,8 +639,8 @@
             localStorage.setItem('bolao_user_celular', celular);
             location.reload();
         });
-    } // <--- FECHA A FUNÇÃO CONECTARUSUARIO
-        }
-    </script>
+    } // Fecha a função conectarUsuario
+</script>
 </body>
 </html>
+ 
