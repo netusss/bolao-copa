@@ -342,17 +342,7 @@
             });
         }
 
-        function conectarUsuario() {
-            const btn = document.getElementById('btn-entrar');
-            btn.innerText = "Conectando...";
-            let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
-
-            if(!celular) {
-                btn.innerText = "ENTRAR NO BOLÃO";
-                return alert("Preencha o celular!");
-            }
-
-            db.collection("usuarios").doc(celular).set({
+                    db.collection("usuarios").doc(celular).set({
                 nome: document.getElementById('login-nome').value,
                 apelido: document.getElementById('login-apelido').value
             }, {merge: true}).then(() => {
@@ -618,7 +608,7 @@
             location.reload();
         }
 
-        window.onload = () => {
+       window.onload = () => {
             db.collection("sistema").doc("resultados").get().then(doc => {
                 if(doc.exists) resultadosOficiais = doc.data();
                 iniciarTabela();
@@ -629,7 +619,21 @@
                 const salvo = localStorage.getItem('bolao_user_celular');
                 if(salvo) carregarSessao(salvo);
             });
-        };
+        }; // <--- A função window.onload termina aqui
+
+        // A função conectarUsuario agora está FORA e disponível para o botão
+        function conectarUsuario() {
+            const btn = document.getElementById('btn-entrar');
+            btn.innerText = "Conectando...";
+            let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
+
+            if(!celular) {
+                btn.innerText = "ENTRAR NO BOLÃO";
+                return alert("Preencha o celular!");
+            }
+            
+            // ... aqui continua o resto do código do seu banco de dados ...
+        }
     </script>
 </body>
 </html>
