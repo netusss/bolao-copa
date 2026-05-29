@@ -614,25 +614,33 @@
                 iniciarTabela();
                 const salvo = localStorage.getItem('bolao_user_celular');
                 if(salvo) carregarSessao(salvo);
-            }).catch(e => {
-                iniciarTabela();
-                const salvo = localStorage.getItem('bolao_user_celular');
-                if(salvo) carregarSessao(salvo);
-            });
-        }; // <--- A função window.onload termina aqui
+           }).catch(e => {
+            iniciarTabela();
+            const salvo = localStorage.getItem('bolao_user_celular');
+            if(salvo) carregarSessao(salvo);
+        });
+    }; // <--- FECHA O WINDOW.ONLOAD
 
-        // A função conectarUsuario agora está FORA e disponível para o botão
-        function conectarUsuario() {
-            const btn = document.getElementById('btn-entrar');
-            btn.innerText = "Conectando...";
-            let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
+    // A FUNÇÃO FICA AQUI, FORA DE TUDO:
+    function conectarUsuario() {
+        const btn = document.getElementById('btn-entrar');
+        btn.innerText = "Conectando...";
+        let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
 
-            if(!celular) {
-                btn.innerText = "ENTRAR NO BOLÃO";
-                return alert("Preencha o celular!");
-            }
-            
-            // ... aqui continua o resto do código do seu banco de dados ...
+        if(!celular) {
+            btn.innerText = "ENTRAR NO BOLÃO";
+            return alert("Preencha o celular!");
+        }
+
+        // Certifique-se de que este fechamento existe:
+        db.collection("usuarios").doc(celular).set({
+            nome: document.getElementById('login-nome').value,
+            apelido: document.getElementById('login-apelido').value
+        }, {merge: true}).then(() => {
+            localStorage.setItem('bolao_user_celular', celular);
+            location.reload();
+        });
+    } // <--- FECHA A FUNÇÃO CONECTARUSUARIO
         }
     </script>
 </body>
