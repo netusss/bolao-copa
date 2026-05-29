@@ -184,34 +184,37 @@
 
             gruposCopa.forEach((grupo, i) => {
                 const optGroup = document.createElement('optgroup');
-                optGroup.label = grupo.nome;
+          optGroup.label = grupo.nome;
                 grupo.times.forEach(time => {
                     const opt = document.createElement('option');
                     opt.value = time; opt.innerText = time;
                     optGroup.appendChild(opt);
-                    // Adicione isto aqui, dentro da função iniciarTabela, lá no final:
-db.collection("usuarios").onSnapshot(snapshot => {
-    let r = [];
-    snapshot.forEach(doc => {
-        let u = doc.data();
-        let pts = 0;
-        if(u.jogos) {
-            for(let id in u.jogos) {
-                if(resultadosOficiais && resultadosOficiais[id] && u.jogos[id] === resultadosOficiais[id]) pts += 3;
-            }
-        }
-        r.push({ nome: u.apelido || "Anon", pts: pts });
-    });
-    r.sort((a,b) => b.pts - a.pts);
-    let html = '<table style="width:100%">';
-    r.forEach((u, i) => {
-        html += `<tr><td>${i+1}º ${u.nome}</td><td style="text-align:right">${u.pts} pts</td></tr>`;
-    });
-    document.getElementById('ranking-container').innerHTML = html + '</table>';
-});
                 });
-                selectMaster.appendChild(optGroup);
+                selectMaster.appendChild(optGroup); // <--- O código voltou para dentro do loop!
+            }); // <--- Este }); fecha o forEach dos grupos (agora o loop acabou!)
 
+            // O RANKING FICA AQUI, FORA DE TUDO:
+            db.collection("usuarios").onSnapshot(snapshot => {
+                let r = [];
+                snapshot.forEach(doc => {
+                    let u = doc.data();
+                    let pts = 0;
+                    if(u.jogos) {
+                        for(let id in u.jogos) {
+                            if(resultadosOficiais && resultadosOficiais[id] && u.jogos[id] === resultadosOficiais[id]) pts += 3;
+                        }
+                    }
+                    r.push({ nome: u.apelido || "Anon", pts: pts });
+                });
+                r.sort((a,b) => b.pts - a.pts);
+                let html = '<table style="width:100%">';
+                r.forEach((u, i) => {
+                    html += `<tr><td>${i+1}º ${u.nome}</td><td style="text-align:right">${u.pts} pts</td></tr>`;
+                });
+                document.getElementById('ranking-container').innerHTML = html + '</table>';
+            });
+      
+                          
                 confrontos.forEach((comb, j) => {
                     const dataString = grupo.datas[j];
                     const partesEspaco = dataString.split(' ');
