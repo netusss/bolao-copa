@@ -593,50 +593,43 @@
                 iniciarTabela();
                 const salvo = localStorage.getItem('bolao_user_celular');
                 if(salvo) carregarSessao(salvo);
-           }).catch(e => {
-            iniciarTabela();
-            const salvo = localStorage.getItem('bolao_user_celular');
-            if(salvo) carregarSessao(salvo);
-        });
- // Fecha o window.onload
+            }).catch(e => {
+                iniciarTabela();
+                const salvo = localStorage.getItem('bolao_user_celular');
+                if(salvo) carregarSessao(salvo);
+            });
+        }; // Fecha o window.onload corretamente
 
-    // Esta função agora está LIVRE e FORA de qualquer outra função
- }; // Fecha o window.onload
+        function conectarUsuario() {
+            const btn = document.getElementById('btn-entrar');
+            btn.innerText = "Conectando...";
+            let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
 
-    // ... (seu código anterior, ex: window.onload) ...
+            if(!celular) {
+                btn.innerText = "ENTRAR NO BOLÃO";
+                return alert("Preencha o celular!");
+            }
 
-    // Esta função deve vir ANTES da carregarSessao
-    function conectarUsuario() {
-        const btn = document.getElementById('btn-entrar');
-        btn.innerText = "Conectando...";
-        let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
-
-        if(!celular) {
-            btn.innerText = "ENTRAR NO BOLÃO";
-            return alert("Preencha o celular!");
+            db.collection("usuarios").doc(celular).set({
+                nome: document.getElementById('login-nome').value,
+                apelido: document.getElementById('login-apelido').value
+            }, {merge: true}).then(() => {
+                localStorage.setItem('bolao_user_celular', celular);
+                location.reload();
+            });
         }
 
-        db.collection("usuarios").doc(celular).set({
-            nome: document.getElementById('login-nome').value,
-            apelido: document.getElementById('login-apelido').value
-        }, {merge: true}).then(() => {
-            localStorage.setItem('bolao_user_celular', celular);
-            location.reload();
-        });
-    }
-
-    // A carregarSessao continua aqui embaixo
-    function carregarSessao(celular) {
-        db.collection("usuarios").doc(celular).get().then(doc => {
-            if(doc.exists) {
-                const dados = doc.data();
-                document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
-                if(dados.campeaoApostado) {
-                    document.getElementById('master-champion-select').value = dados.campeaoApostado;
+        function carregarSessao(celular) {
+            db.collection("usuarios").doc(celular).get().then(doc => {
+                if(doc.exists) {
+                    const dados = doc.data();
+                    document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                    if(dados.campeaoApostado) {
+                        document.getElementById('master-champion-select').value = dados.campeaoApostado;
+                    }
                 }
-            }
-        });
-    }
-</script>
+            });
+        }
+    </script>
 </body>
 </html>
