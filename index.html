@@ -288,24 +288,27 @@
                 const idJogoReal = jogo.idC.replace('_c', '');
                 
                 if(resultadosOficiais[idJogoReal]) return; 
-
-                const inputC = document.getElementById(jogo.idC);
-                const inputF = document.getElementById(jogo.idF);
-                const card = document.getElementById(`card_${jogo.idC}`);
-                const inputC = document.getElementById(jogo.idC);
-                const inputF = document.getElementById(jogo.idF);
-                const card = document.getElementById(`card_${jogo.idC}`);
-                const dateLabel = document.getElementById(`date_${jogo.idC}`);
-                const btnSalvar = document.getElementById(`btn_salvar_${jogo.idC}`);
-                const selectGol = document.getElementById('gol_' + idJogoReal);
+// (Dentro do forEach dos jogos)
+                // Use apenas a atribuição, sem declarar 'const' ou 'let' de novo
+                let inputC = document.getElementById(jogo.idC);
+                let inputF = document.getElementById(jogo.idF);
+                let card = document.getElementById(`card_${jogo.idC}`);
+                let dateLabel = document.getElementById(`date_${jogo.idC}`);
+                let btnSalvar = document.getElementById(`btn_salvar_${jogo.idC}`);
+                let selectGol = document.getElementById('gol_' + idJogoReal);
                 
-                // Validação de segurança
                 if(!inputC || !inputF) return;
 
-                // Agora inicia a lógica de controle
                 if (MODO_TESTE) {
+                    // ... (seu código de modo teste)
+                } else {
                     inputC.disabled = false; 
                     inputF.disabled = false;
+                    // ... o resto do seu código
+                }
+            }); 
+        }); 
+    }
                     if(selectGol) selectGol.disabled = false;
                     if(btnSalvar) btnSalvar.disabled = false;
                     card.style.opacity = '1';
