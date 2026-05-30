@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -184,37 +184,34 @@
 
             gruposCopa.forEach((grupo, i) => {
                 const optGroup = document.createElement('optgroup');
-          optGroup.label = grupo.nome;
+                optGroup.label = grupo.nome;
                 grupo.times.forEach(time => {
                     const opt = document.createElement('option');
                     opt.value = time; opt.innerText = time;
                     optGroup.appendChild(opt);
+                    // Adicione isto aqui, dentro da função iniciarTabela, lá no final:
+db.collection("usuarios").onSnapshot(snapshot => {
+    let r = [];
+    snapshot.forEach(doc => {
+        let u = doc.data();
+        let pts = 0;
+        if(u.jogos) {
+            for(let id in u.jogos) {
+                if(resultadosOficiais && resultadosOficiais[id] && u.jogos[id] === resultadosOficiais[id]) pts += 3;
+            }
+        }
+        r.push({ nome: u.apelido || "Anon", pts: pts });
+    });
+    r.sort((a,b) => b.pts - a.pts);
+    let html = '<table style="width:100%">';
+    r.forEach((u, i) => {
+        html += `<tr><td>${i+1}º ${u.nome}</td><td style="text-align:right">${u.pts} pts</td></tr>`;
+    });
+    document.getElementById('ranking-container').innerHTML = html + '</table>';
+});
                 });
-                selectMaster.appendChild(optGroup); // <--- O código voltou para dentro do loop!
-            }); // <--- Este }); fecha o forEach dos grupos (agora o loop acabou!)
+                selectMaster.appendChild(optGroup);
 
-            // O RANKING FICA AQUI, FORA DE TUDO:
-            db.collection("usuarios").onSnapshot(snapshot => {
-                let r = [];
-                snapshot.forEach(doc => {
-                    let u = doc.data();
-                    let pts = 0;
-                    if(u.jogos) {
-                        for(let id in u.jogos) {
-                            if(resultadosOficiais && resultadosOficiais[id] && u.jogos[id] === resultadosOficiais[id]) pts += 3;
-                        }
-                    }
-                    r.push({ nome: u.apelido || "Anon", pts: pts });
-                });
-                r.sort((a,b) => b.pts - a.pts);
-                let html = '<table style="width:100%">';
-                r.forEach((u, i) => {
-                    html += `<tr><td>${i+1}º ${u.nome}</td><td style="text-align:right">${u.pts} pts</td></tr>`;
-                });
-                document.getElementById('ranking-container').innerHTML = html + '</table>';
-            });
-      
-                          
                 confrontos.forEach((comb, j) => {
                     const dataString = grupo.datas[j];
                     const partesEspaco = dataString.split(' ');
@@ -232,7 +229,7 @@
                         chave: chaveOrdem
                     });
                 });
-          
+            });
 
             todosOsJogosGlobais.sort((a, b) => a.chave - b.chave);
             let htmlJogos = "";
@@ -288,73 +285,86 @@
                 const idJogoReal = jogo.idC.replace('_c', '');
                 
                 if(resultadosOficiais[idJogoReal]) return; 
-// (Dentro do forEach dos jogos)
-                // Use apenas a atribuição, sem declarar 'const' ou 'let' de novo
-                let inputC = document.getElementById(jogo.idC);
-                let inputF = document.getElementById(jogo.idF);
-                let card = document.getElementById(`card_${jogo.idC}`);
-                let dateLabel = document.getElementById(`date_${jogo.idC}`);
-                let btnSalvar = document.getElementById(`btn_salvar_${jogo.idC}`);
-                let selectGol = document.getElementById('gol_' + idJogoReal);
+
+                const inputC = document.getElementById(jogo.idC);
+                const inputF = document.getElementById(jogo.idF);
+                const card = document.getElementById(`card_${jogo.idC}`);
+                const dateLabel = document.getElementById(`date_${jogo.idC}`);
+                const btnSalvar = document.getElementById(`btn_salvar_${jogo.idC}`);
+                const selectGol = document.getElementById('gol_' + idJogoReal);
                 
                 if(!inputC || !inputF) return;
 
                 if (MODO_TESTE) {
-                    // ... (seu código de modo teste)
-               // O primeiro bloco precisa ser um IF, não um ELSE
-                if (MODO_TESTE) {
-                    inputC.disabled = false; 
-                    inputF.disabled = false;
+                    inputC.disabled = false; inputF.disabled = false;
                     if(selectGol) selectGol.disabled = false;
                     if(btnSalvar) btnSalvar.disabled = false;
                     card.style.opacity = '1';
-                    dateLabel.innerHTML = `✅ Modo Teste`;
-                } else {
-                    // Agora sim, este ELSE funciona para o resto
-                    inputC.disabled = false; 
-                    inputF.disabled = false;
-                    if(selectGol) selectGol.disabled = false;
-                    if(btnSalvar) btnSalvar.disabled = false;
-                    card.style.opacity = '1';
-                    dateLabel.innerHTML = `✅ Liberado | ⏰ ${jogo.data.split(' ')[1]}`;
-                    dateLabel.style.background = 'var(--primary)'; 
-                    dateLabel.style.color = '#111';
+                    dateLabel.innerHTML = `✅ Modo Teste | ⏰ ${jogo.data.split(' ')[1]} - ${jogo.grupo}`;
+                    dateLabel.style.background = 'var(--primary)';
+                    return;
                 }
-                }
-                    card.style.opacity = '1';
-                 dateLabel.innerHTML = `✅ Liberado | ⏰ ${jogo.data.split(' ')[1]} - ${jogo.grupo}`;
-                    dateLabel.style.background = 'var(--primary)'; dateLabel.style.color = '#111';
-            
-            }); // Fecha o forEach dos jogos
-        ); // Fecha o .get() dos jogos
-    } // <--- ESTA CHAVE ESTAVA FALTANDO. Ela fecha a função que processa os jogos.
 
-    // Agora começa a função de salvar o usuário de forma limpa
-    function conectarUsuario() {
-        let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
-        
-        db.collection("usuarios").doc(celular).set({
-            nome: document.getElementById('login-nome').value,
-            apelido: document.getElementById('login-apelido').value
-        }, {merge: true}).then(() => {
-            localStorage.setItem('bolao_user_celular', celular);
-            location.reload();
-        });
-    } // <--- Esta chave fecha a função conectarUsuario
-   Esta chave fecha a função conectarUsuario
-
-    function carregarSessao(celular) {
-        db.collection("usuarios").doc(celular).get().then(doc => {
-            if(doc.exists) {
-                const dados = doc.data();
-                document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                const partesData = jogo.data.split(' ')[0].split('/');
+                const partesHora = jogo.data.split(' ')[1].split(':');
+                const mes = parseInt(partesData[1]) - 1; 
+                const dia = parseInt(partesData[0]);
                 
-                if(dados.campeaoApostado) {
-                    document.getElementById('master-champion-select').value = dados.campeaoApostado;
+                const inicioDoDia = new Date(anoCopa, mes, dia, 0, 0, 0);
+                const dataHoraJogo = new Date(anoCopa, mes, dia, parseInt(partesHora[0]), parseInt(partesHora[1]), 0);
+                const tempoLimite = new Date(dataHoraJogo.getTime() - (5 * 60 * 1000));
+
+                if (agora < inicioDoDia) {
+                    inputC.disabled = true; inputF.disabled = true;
+                    if(selectGol) selectGol.disabled = true;
+                    if(btnSalvar) btnSalvar.disabled = true;
+                    card.style.opacity = '0.5';
+                    dateLabel.innerHTML = `🔒 Abre dia ${jogo.data.split(' ')[0]} | ⏰ ${jogo.data.split(' ')[1]}`;
+                    dateLabel.style.background = '#aa0000'; dateLabel.style.color = '#fff';
+                } else if (agora >= tempoLimite) {
+                    inputC.disabled = true; inputF.disabled = true;
+                    if(selectGol) selectGol.disabled = true;
+                    if(btnSalvar) btnSalvar.disabled = true;
+                    card.style.opacity = '0.5';
+                    dateLabel.innerHTML = `🚫 Encerrado | ⏰ ${jogo.data.split(' ')[1]}`;
+                    dateLabel.style.background = '#444'; dateLabel.style.color = '#aaa';
+                } else {
+                    inputC.disabled = false; inputF.disabled = false;
+                    if(selectGol) selectGol.disabled = false;
+                    if(btnSalvar) btnSalvar.disabled = false;
+                    card.style.opacity = '1';
+                    dateLabel.innerHTML = `✅ Liberado | ⏰ ${jogo.data.split(' ')[1]} - ${jogo.grupo}`;
+                    dateLabel.style.background = 'var(--primary)'; dateLabel.style.color = '#111';
                 }
+            });
+        }
+
+        function conectarUsuario() {
+            const btn = document.getElementById('btn-entrar');
+            btn.innerText = "Conectando...";
+            let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
+
+            if(!celular) {
+                btn.innerText = "ENTRAR NO BOLÃO";
+                return alert("Preencha o celular!");
             }
-        });
-    }
+
+            db.collection("usuarios").doc(celular).set({
+                nome: document.getElementById('login-nome').value,
+                apelido: document.getElementById('login-apelido').value
+            }, {merge: true}).then(() => {
+                localStorage.setItem('bolao_user_celular', celular);
+                location.reload();
+            });
+        }
+
+        function carregarSessao(celular) {
+            db.collection("usuarios").doc(celular).get().then(doc => {
+                if(doc.exists) {
+                    const dados = doc.data();
+                    document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                    
+                    if(dados.campeaoApostado) document.getElementById('master-champion-select').value = dados.campeaoApostado;
                     
                     if(dados.jogos) {
                         for (let idJogo in dados.jogos) {
@@ -605,7 +615,7 @@
             location.reload();
         }
 
-       window.onload = () => {
+        window.onload = () => {
             db.collection("sistema").doc("resultados").get().then(doc => {
                 if(doc.exists) resultadosOficiais = doc.data();
                 iniciarTabela();
@@ -616,38 +626,7 @@
                 const salvo = localStorage.getItem('bolao_user_celular');
                 if(salvo) carregarSessao(salvo);
             });
-        }; // Fecha o window.onload corretamente
-
-        function conectarUsuario() {
-            const btn = document.getElementById('btn-entrar');
-            btn.innerText = "Conectando...";
-            let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
-
-            if(!celular) {
-                btn.innerText = "ENTRAR NO BOLÃO";
-                return alert("Preencha o celular!");
-            }
-
-            db.collection("usuarios").doc(celular).set({
-                nome: document.getElementById('login-nome').value,
-                apelido: document.getElementById('login-apelido').value
-            }, {merge: true}).then(() => {
-                localStorage.setItem('bolao_user_celular', celular);
-                location.reload();
-            });
-        }
-
-        function carregarSessao(celular) {
-            db.collection("usuarios").doc(celular).get().then(doc => {
-                if(doc.exists) {
-                    const dados = doc.data();
-                    document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
-                    if(dados.campeaoApostado) {
-                        document.getElementById('master-champion-select').value = dados.campeaoApostado;
-                    }
-                }
-            });
-        }
+        };
     </script>
 </body>
 </html>
