@@ -624,9 +624,11 @@
             const salvo = localStorage.getItem('bolao_user_celular');
             if(salvo) carregarSessao(salvo);
         });
-    }; // Fecha o window.onload
+ // Fecha o window.onload
 
     // Esta função agora está LIVRE e FORA de qualquer outra função
+  }; // Fecha o window.onload
+
     function conectarUsuario() {
         const btn = document.getElementById('btn-entrar');
         btn.innerText = "Conectando...";
@@ -644,7 +646,19 @@
             localStorage.setItem('bolao_user_celular', celular);
             location.reload();
         });
-    } // Fecha a função conectarUsuario
+    }
+
+    function carregarSessao(celular) {
+        db.collection("usuarios").doc(celular).get().then(doc => {
+            if(doc.exists) {
+                const dados = doc.data();
+                document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                if(dados.campeaoApostado) {
+                    document.getElementById('master-champion-select').value = dados.campeaoApostado;
+                }
+            }
+        });
+    }
 </script>
 </body>
 </html>
