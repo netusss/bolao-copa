@@ -202,12 +202,17 @@ db.collection("usuarios").onSnapshot(snapshot => {
         }
         r.push({ nome: u.apelido || "Anon", pts: pts });
     });
-    r.sort((a,b) => b.pts - a.pts);
-    let html = '<table style="width:100%">';
+   r.sort((a,b) => b.pts - a.pts);
+let html = '<table style="width:100%">';
+
+if (r.length === 0) {
+    html += '<tr><td style="text-align:center; color:#555;">Nenhum palpite registrado ainda.</td></tr>';
+} else {
     r.forEach((u, i) => {
         html += `<tr><td>${i+1}º ${u.nome}</td><td style="text-align:right">${u.pts} pts</td></tr>`;
     });
-    document.getElementById('ranking-container').innerHTML = html + '</table>';
+}
+document.getElementById('ranking-container').innerHTML = html + '</table>';
 });
                 });
                 selectMaster.appendChild(optGroup);
