@@ -343,21 +343,26 @@
         }
 
                     db.collection("usuarios").doc(celular).set({
-                nome: document.getElementById('login-nome').value,
-                apelido: document.getElementById('login-apelido').value
-            }, {merge: true}).then(() => {
-                localStorage.setItem('bolao_user_celular', celular);
-                location.reload();
-            });
-        }
+            nome: document.getElementById('login-nome').value,
+            apelido: document.getElementById('login-apelido').value
+        }, {merge: true}).then(() => {
+            localStorage.setItem('bolao_user_celular', celular);
+            location.reload();
+        });
+    } // <--- Esta chave fecha a função conectarUsuario
 
-        function carregarSessao(celular) {
-            db.collection("usuarios").doc(celular).get().then(doc => {
-                if(doc.exists) {
-                    const dados = doc.data();
-                    document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
-                    
-                    if(dados.campeaoApostado) document.getElementById('master-champion-select').value = dados.campeaoApostado;
+    function carregarSessao(celular) {
+        db.collection("usuarios").doc(celular).get().then(doc => {
+            if(doc.exists) {
+                const dados = doc.data();
+                document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                
+                if(dados.campeaoApostado) {
+                    document.getElementById('master-champion-select').value = dados.campeaoApostado;
+                }
+            }
+        });
+    }
                     
                     if(dados.jogos) {
                         for (let idJogo in dados.jogos) {
