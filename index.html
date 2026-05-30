@@ -301,16 +301,16 @@
 
                 if (MODO_TESTE) {
                     // ... (seu código de modo teste)
-                } else {
+               // O primeiro bloco precisa ser um IF, não um ELSE
+                if (MODO_TESTE) {
                     inputC.disabled = false; 
                     inputF.disabled = false;
-                    // ... o resto do seu código
-                        if(selectGol) selectGol.disabled = false;
+                    if(selectGol) selectGol.disabled = false;
                     if(btnSalvar) btnSalvar.disabled = false;
                     card.style.opacity = '1';
                     dateLabel.innerHTML = `✅ Modo Teste`;
                 } else {
-                    // Se não for modo teste, executa o resto do seu código aqui
+                    // Agora sim, este ELSE funciona para o resto
                     inputC.disabled = false; 
                     inputF.disabled = false;
                     if(selectGol) selectGol.disabled = false;
@@ -319,6 +319,7 @@
                     dateLabel.innerHTML = `✅ Liberado | ⏰ ${jogo.data.split(' ')[1]}`;
                     dateLabel.style.background = 'var(--primary)'; 
                     dateLabel.style.color = '#111';
+                }
                 }
                     card.style.opacity = '1';
                  dateLabel.innerHTML = `✅ Liberado | ⏰ ${jogo.data.split(' ')[1]} - ${jogo.grupo}`;
