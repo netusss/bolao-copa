@@ -629,6 +629,9 @@
     // Esta função agora está LIVRE e FORA de qualquer outra função
  }; // Fecha o window.onload
 
+    // ... (seu código anterior, ex: window.onload) ...
+
+    // Esta função deve vir ANTES da carregarSessao
     function conectarUsuario() {
         const btn = document.getElementById('btn-entrar');
         btn.innerText = "Conectando...";
@@ -648,6 +651,7 @@
         });
     }
 
+    // A carregarSessao continua aqui embaixo
     function carregarSessao(celular) {
         db.collection("usuarios").doc(celular).get().then(doc => {
             if(doc.exists) {
