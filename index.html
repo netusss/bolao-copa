@@ -195,9 +195,22 @@ db.collection("usuarios").onSnapshot(snapshot => {
     snapshot.forEach(doc => {
         let u = doc.data();
         let pts = 0;
+        
+        // --- COLE AQUI O BLOCO ---
+        let celularLogado = localStorage.getItem('bolao_user_celular');
+        if (doc.id === celularLogado && u.campeaoApostado) {
+            let select = document.getElementById('master-champion-select');
+            if(select) select.style.display = 'none';
+            
+            let btn = document.querySelector('button[onclick="salvarApostaCampeao()"]');
+            if(btn) btn.style.display = 'none';
+        }
+        // -------------------------
+
         if(u.jogos) {
             for(let id in u.jogos) {
                 if(resultadosOficiais && resultadosOficiais[id] && u.jogos[id] === resultadosOficiais[id]) pts += 3;
+                // ... o resto do seu código continua aqui
             }
         }
         r.push({ nome: u.apelido || "Anon", pts: pts });
