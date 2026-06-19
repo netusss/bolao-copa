@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+       <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -27,20 +28,23 @@
             db.collection("usuarios").onSnapshot(snapshotUsers => {
                 let r = [];
                 snapshotUsers.forEach(doc => {
-                    let u = doc.data();
-                    let pts = 0;
-                    
-                    if(u.palpites) {
-                        for(let id in u.palpites) {
-                            let real = placaresReais[id];
-                            let aposta = u.palpites[id];
-                            if(real !== undefined && real.p1 !== "" && aposta.p1 == real.p1 && aposta.p2 == real.p2) {
-                                pts += 3;
+                    try {
+                        let u = doc.data();
+                        let pts = 0;
+                        
+                        if(u.palpites) {
+                            for(let id in u.palpites) {
+                                let real = placaresReais[id];
+                                let aposta = u.palpites[id];
+                                if(real !== undefined && real.p1 !== "" && aposta && aposta.p1 == real.p1 && aposta.p2 == real.p2) {
+                                    pts += 3;
+                                }
                             }
                         }
+                        r.push({ nome: u.apelido || "Anon", pts: pts });
+                    } catch (e) {
+                        console.error("Erro ao processar usuário " + doc.id, e);
                     }
-                    
-                    r.push({ nome: u.apelido || "Anon", pts: pts });
                 });
                 
                 r.sort((a,b) => b.pts - a.pts);
