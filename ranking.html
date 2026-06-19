@@ -1,5 +1,4 @@
-
-       <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -26,6 +25,7 @@
             snapshotJogos.forEach(doc => { let j = doc.data(); if(j.id) placaresReais[j.id] = { p1: j.placarReal1, p2: j.placarReal2 }; });
             
             db.collection("usuarios").onSnapshot(snapshotUsers => {
+                console.log("Número de usuários encontrados:", snapshotUsers.size); // LINHA DE DEBUG ADICIONADA
                 let r = [];
                 snapshotUsers.forEach(doc => {
                     try {
