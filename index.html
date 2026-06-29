@@ -19,8 +19,9 @@
         
         button.btn-master { width: 100%; padding: 15px; border-radius: 8px; border: none; background: var(--primary); font-weight: bold; font-size: 1.1em; cursor: pointer; margin-top: 10px; color: #111; }
         select, input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; background: #111; color: white; border: 1px solid #444; box-sizing: border-box; }
+        input:disabled { background: #000; color: #555; cursor: not-allowed; border: 1px solid #222; }
         
-        .match-card { background: #222; border-radius: 8px; border: 1px solid #ffcc00; padding: 15px; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255, 204, 0, 0.2); }
+        .match-card { background: #222; border-radius: 8px; border: 1px solid #ffcc00; padding: 15px; margin-bottom: 12px; box-shadow: 0 0 10px rgba(255, 204, 0, 0.2); transition: 0.3s; }
         .match-date { text-align: center; font-size: 0.9em; color: #111; background: var(--primary); padding: 6px; border-radius: 4px; margin-bottom: 12px; font-weight: bold; }
         .match-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .match-row span { flex: 1; text-align: center; font-weight: bold; font-size: 1.1em; }
@@ -30,14 +31,12 @@
         .pix-container { display: flex; gap: 8px; margin-top: 10px; align-items: center; justify-content: center; }
         .btn-copiar { background: var(--primary); color: #111; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        /* Estilo do painel de Admin */
         #admin-panel { display: none; border-color: red; background: #331111; }
     </style>
 </head>
 <body>
     <div class="app-container">
         
-        <!-- TELA DE LOGIN -->
         <section id="login-screen" class="screen active">
             <h1 style="text-align: center; color: var(--primary);">Bolão Resenha 🏆</h1>
             <p style="text-align: center; color: #aaa; margin-bottom: 20px;">Mata-Mata: Brasil x Japão!</p>
@@ -47,11 +46,9 @@
             <button class="btn-master" onclick="conectarUsuario()">ENTRAR NO BOLÃO</button>
         </section>
 
-        <!-- TELA DOS JOGOS -->
         <section id="games-screen" class="screen">
             <h2 class="player-nickname" style="color: var(--primary); text-align: center; margin-bottom: 20px;">Bem-vindo</h2>
             
-            <!-- PAINEL ADMIN -->
             <div id="admin-panel" class="card">
                 <h3 style="color:red; margin-top:0; text-align:center;">🛠️ PAINEL ADMIN</h3>
                 <p style="font-size: 0.85em; color: #ffaaaa; text-align:center;">Lançar placar REAL (Fim de Jogo)</p>
@@ -65,7 +62,6 @@
                 <button class="btn-master" style="background:red; color:white; font-size:1em;" onclick="salvarResultadoOficial()">Salvar Placar Oficial</button>
             </div>
 
-            <!-- APOSTA MASTER (CAMPEÃO) -->
             <div class="card" style="border-color: var(--primary);">
                 <h3 style="color: var(--primary); margin-top: 0;">👑 Aposta Master</h3>
                 <label style="font-size: 0.8em; color: #aaa;">Quem será o grande Campeão do Mundo?</label>
@@ -83,8 +79,7 @@
                 <button class="btn-master" onclick="salvarApostaCampeao()">SALVAR SELEÇÃO CAMPEÃ</button>
             </div>
 
-            <!-- JOGO ÚNICO: BRASIL X JAPÃO -->
-            <div class="match-card">
+            <div class="match-card" id="card-jogo">
                 <div class="match-date">⏰ SEGUNDA-FEIRA - OITAVAS DE FINAL</div>
                 <div class="match-row">
                     <span>🇧🇷 Brasil</span>
@@ -97,7 +92,6 @@
                 <button class="btn-master" id="btn-salvar-jogo" onclick="salvarJogoUnico()">⚽ SALVAR PALPITE (R$ 10,00)</button>
             </div>
 
-            <!-- ÁREA DO PIX -->
             <div id="pix-area" class="card">
                 <h3 style="color: var(--primary); margin: 0;">✅ Aposta Registrada!</h3>
                 <p>Para validar a sua participação, efetue o pagamento.</p>
@@ -115,7 +109,9 @@
         const firebaseConfig = { apiKey: "AIzaSyC0106qe3GnZM6xJyE5OHG-JQsWoWqbHMg", authDomain: "bolao2026-450ff.firebaseapp.com", projectId: "bolao2026-450ff", storageBucket: "bolao2026-450ff.firebasestorage.app", messagingSenderId: "186761975126", appId: "1:186761975126:web:450f60eb0bd1f5e04132f7" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const CELULAR_ADMIN = "75992637960"; // Seu número de Admin
+        const CELULAR_ADMIN = "75992637960"; 
+        
+        let resultadoOficial = null;
 
         function conectarUsuario() {
             let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
@@ -133,33 +129,73 @@
             });
         }
 
-        function carregarSessao() {
+        function iniciarApp() {
             const salvo = localStorage.getItem('bolao_user_celular');
             if(!salvo) return;
-
-            db.collection("usuarios").doc(salvo).get().then(doc => {
-                if(doc.exists) {
-                    const dados = doc.data();
-                    document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
-                    
-                    if(dados.campeaoApostado) {
-                        document.getElementById('master-champion-select').value = dados.campeaoApostado;
-                    }
-                    if(dados.jogos && dados.jogos["brasil_japao"]) {
-                        let partes = dados.jogos["brasil_japao"].split('x');
-                        document.getElementById('placar_brasil').value = partes[0];
-                        document.getElementById('placar_japao').value = partes[1];
-                        document.getElementById('btn-salvar-jogo').innerText = "✏️ Alterar Aposta";
-                    }
-
-                    // Se for você, mostra o painel de Admin
-                    if(salvo === CELULAR_ADMIN) {
-                        document.getElementById('admin-panel').style.display = 'block';
-                    }
-
-                    document.getElementById('login-screen').classList.remove('active');
-                    document.getElementById('games-screen').classList.add('active');
+            
+            // Primeiro, busca se já tem resultado oficial lançado
+            db.collection("sistema").doc("resultados").get().then(docSist => {
+                if(docSist.exists && docSist.data()["brasil_japao"]) {
+                    resultadoOficial = docSist.data()["brasil_japao"];
                 }
+                
+                // Depois, busca os dados do usuário logado
+                db.collection("usuarios").doc(salvo).get().then(doc => {
+                    if(doc.exists) {
+                        const dados = doc.data();
+                        document.querySelector('.player-nickname').innerText = "Olá, " + dados.apelido;
+                        
+                        if(dados.campeaoApostado) {
+                            document.getElementById('master-champion-select').value = dados.campeaoApostado;
+                        }
+                        
+                        let apostaFeita = null;
+                        if(dados.jogos && dados.jogos["brasil_japao"]) {
+                            apostaFeita = dados.jogos["brasil_japao"];
+                            let partes = apostaFeita.split('x');
+                            document.getElementById('placar_brasil').value = partes[0];
+                            document.getElementById('placar_japao').value = partes[1];
+                            document.getElementById('btn-salvar-jogo').innerText = "✏️ Alterar Aposta";
+                        }
+
+                        if(salvo === CELULAR_ADMIN) {
+                            document.getElementById('admin-panel').style.display = 'block';
+                        }
+                        
+                        // Lógica visual de Acerto ou Erro
+                        if (resultadoOficial) {
+                            let card = document.getElementById('card-jogo');
+                            let aviso = document.createElement('div');
+                            aviso.style.padding = "10px"; aviso.style.textAlign = "center";
+                            aviso.style.borderRadius = "5px"; aviso.style.marginTop = "15px";
+                            aviso.style.fontWeight = "bold";
+
+                            document.getElementById('placar_brasil').disabled = true;
+                            document.getElementById('placar_japao').disabled = true;
+                            document.getElementById('btn-salvar-jogo').style.display = 'none';
+
+                            if (apostaFeita) {
+                                if (apostaFeita === resultadoOficial) {
+                                    card.style.borderColor = "gold"; card.style.boxShadow = "0 0 15px gold";
+                                    aviso.style.background = "gold"; aviso.style.color = "#000";
+                                    aviso.innerHTML = "🏆 GABARITOU! Você acertou o placar!";
+                                } else {
+                                    card.style.borderColor = "#ff3333";
+                                    aviso.style.background = "#331111"; aviso.style.color = "#ff6666";
+                                    aviso.innerHTML = `❌ Errou. (Resultado Oficial: ${resultadoOficial})`;
+                                }
+                            } else {
+                                card.style.opacity = "0.6";
+                                aviso.style.background = "#222"; aviso.style.color = "#aaa";
+                                aviso.innerHTML = `Fim de Jogo. (Oficial: ${resultadoOficial})`;
+                            }
+                            card.appendChild(aviso);
+                        }
+
+                        document.getElementById('login-screen').classList.remove('active');
+                        document.getElementById('games-screen').classList.add('active');
+                    }
+                });
             });
         }
 
@@ -168,9 +204,7 @@
             const p1 = document.getElementById('placar_brasil').value;
             const p2 = document.getElementById('placar_japao').value;
 
-            if(p1 === "" || p2 === "") {
-                return alert("Preencha o placar do jogo!");
-            }
+            if(p1 === "" || p2 === "") return alert("Preencha o placar do jogo!");
 
             const placarCompleto = p1 + "x" + p2;
 
@@ -206,6 +240,7 @@
                     "brasil_japao": placarCompleto
                 }, {merge: true}).then(() => {
                     alert("✅ Placar oficial salvo no sistema!");
+                    location.reload();
                 });
             }
         }
@@ -213,9 +248,7 @@
         function copiarPix() {
             const chaveInput = document.getElementById("chave-pix");
             chaveInput.select();
-            navigator.clipboard.writeText(chaveInput.value).then(() => {
-                alert("Chave PIX copiada!");
-            });
+            navigator.clipboard.writeText(chaveInput.value).then(() => alert("Chave PIX copiada!"));
         }
 
         function sairConta() {
@@ -223,7 +256,7 @@
             location.reload();
         }
 
-        window.onload = carregarSessao;
+        window.onload = iniciarApp;
     </script>
 </body>
 </html>
