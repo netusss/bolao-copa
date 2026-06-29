@@ -29,6 +29,9 @@
         #pix-area { display: none; text-align: center; background: #17171f; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 2px dashed var(--primary); color: white; }
         .pix-container { display: flex; gap: 8px; margin-top: 10px; align-items: center; justify-content: center; }
         .btn-copiar { background: var(--primary); color: #111; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        /* Estilo do painel de Admin */
+        #admin-panel { display: none; border-color: red; background: #331111; }
     </style>
 </head>
 <body>
@@ -48,6 +51,20 @@
         <section id="games-screen" class="screen">
             <h2 class="player-nickname" style="color: var(--primary); text-align: center; margin-bottom: 20px;">Bem-vindo</h2>
             
+            <!-- PAINEL ADMIN -->
+            <div id="admin-panel" class="card">
+                <h3 style="color:red; margin-top:0; text-align:center;">🛠️ PAINEL ADMIN</h3>
+                <p style="font-size: 0.85em; color: #ffaaaa; text-align:center;">Lançar placar REAL (Fim de Jogo)</p>
+                <div class="match-row">
+                    <span>🇧🇷 Brasil</span>
+                    <input type="number" id="admin_brasil" min="0" placeholder="0">
+                    <span>X</span>
+                    <input type="number" id="admin_japao" min="0" placeholder="0">
+                    <span>🇯🇵 Japão</span>
+                </div>
+                <button class="btn-master" style="background:red; color:white; font-size:1em;" onclick="salvarResultadoOficial()">Salvar Placar Oficial</button>
+            </div>
+
             <!-- APOSTA MASTER (CAMPEÃO) -->
             <div class="card" style="border-color: var(--primary);">
                 <h3 style="color: var(--primary); margin-top: 0;">👑 Aposta Master</h3>
@@ -98,6 +115,7 @@
         const firebaseConfig = { apiKey: "AIzaSyC0106qe3GnZM6xJyE5OHG-JQsWoWqbHMg", authDomain: "bolao2026-450ff.firebaseapp.com", projectId: "bolao2026-450ff", storageBucket: "bolao2026-450ff.firebasestorage.app", messagingSenderId: "186761975126", appId: "1:186761975126:web:450f60eb0bd1f5e04132f7" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const CELULAR_ADMIN = "75992637960"; // Seu número de Admin
 
         function conectarUsuario() {
             let celular = document.getElementById('login-celular').value.replace(/\D/g, '');
@@ -132,6 +150,11 @@
                         document.getElementById('placar_brasil').value = partes[0];
                         document.getElementById('placar_japao').value = partes[1];
                         document.getElementById('btn-salvar-jogo').innerText = "✏️ Alterar Aposta";
+                    }
+
+                    // Se for você, mostra o painel de Admin
+                    if(salvo === CELULAR_ADMIN) {
+                        document.getElementById('admin-panel').style.display = 'block';
                     }
 
                     document.getElementById('login-screen').classList.remove('active');
@@ -169,6 +192,22 @@
             }).then(() => {
                 alert("Sua aposta master de Seleção Campeã foi salva!");
             });
+        }
+        
+        function salvarResultadoOficial() {
+            const p1 = document.getElementById('admin_brasil').value;
+            const p2 = document.getElementById('admin_japao').value;
+
+            if(p1 === "" || p2 === "") return alert("Preencha o placar oficial!");
+            
+            if(confirm("Tem certeza que este é o placar final oficial?")) {
+                const placarCompleto = p1 + "x" + p2;
+                db.collection("sistema").doc("resultados").set({
+                    "brasil_japao": placarCompleto
+                }, {merge: true}).then(() => {
+                    alert("✅ Placar oficial salvo no sistema!");
+                });
+            }
         }
 
         function copiarPix() {
