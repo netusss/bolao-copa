@@ -34,6 +34,7 @@
 <body>
     <div class="app-container">
         
+        <!-- TELA DE LOGIN -->
         <section id="login-screen" class="screen active">
             <h1 style="text-align: center; color: var(--primary);">Bolão Resenha 🏆</h1>
             <p style="text-align: center; color: #aaa; margin-bottom: 20px;">Mata-Mata: Brasil x Japão!</p>
@@ -43,9 +44,11 @@
             <button class="btn-master" onclick="conectarUsuario()">ENTRAR NO BOLÃO</button>
         </section>
 
+        <!-- TELA DOS JOGOS -->
         <section id="games-screen" class="screen">
             <h2 class="player-nickname" style="color: var(--primary); text-align: center; margin-bottom: 20px;">Bem-vindo</h2>
             
+            <!-- APOSTA MASTER (CAMPEÃO) -->
             <div class="card" style="border-color: var(--primary);">
                 <h3 style="color: var(--primary); margin-top: 0;">👑 Aposta Master</h3>
                 <label style="font-size: 0.8em; color: #aaa;">Quem será o grande Campeão do Mundo?</label>
@@ -63,6 +66,7 @@
                 <button class="btn-master" onclick="salvarApostaCampeao()">SALVAR SELEÇÃO CAMPEÃ</button>
             </div>
 
+            <!-- JOGO ÚNICO: BRASIL X JAPÃO -->
             <div class="match-card">
                 <div class="match-date">⏰ SEGUNDA-FEIRA - OITAVAS DE FINAL</div>
                 <div class="match-row">
@@ -73,26 +77,10 @@
                     <span>🇯🇵 Japão</span>
                 </div>
                 
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #555; text-align: left;">
-                    <label style="font-size: 0.85em; color: #ffcc00; font-weight: bold;">⭐ Quem faz o 1º Gol do Brasil no Jogo?</label>
-                    <select id="gol_brasil" style="margin-top: 5px;">
-                        <option value="">Selecione o jogador...</option>
-                        <option value="Endrick">Endrick</option>
-                        <option value="Neymar Júnior">Neymar Júnior</option>
-                        <option value="Vinícius Júnior">Vinícius Júnior</option>
-                        <option value="Raphinha">Raphinha</option>
-                        <option value="Luiz Henrique">Luiz Henrique</option>
-                        <option value="Gabriel Martinelli">Gabriel Martinelli</option>
-                        <option value="Lucas Paquetá">Lucas Paquetá</option>
-                        <option value="Bruno Guimarães">Bruno Guimarães</option>
-                        <option value="Gol Contra">Gol Contra (Adversário)</option>
-                        <option value="Nenhum">Nenhum Gol do Brasil</option>
-                    </select>
-                </div>
-                
                 <button class="btn-master" id="btn-salvar-jogo" onclick="salvarJogoUnico()">⚽ SALVAR PALPITE (R$ 10,00)</button>
             </div>
 
+            <!-- ÁREA DO PIX -->
             <div id="pix-area" class="card">
                 <h3 style="color: var(--primary); margin: 0;">✅ Aposta Registrada!</h3>
                 <p>Para validar a sua participação, efetue o pagamento.</p>
@@ -145,9 +133,6 @@
                         document.getElementById('placar_japao').value = partes[1];
                         document.getElementById('btn-salvar-jogo').innerText = "✏️ Alterar Aposta";
                     }
-                    if(dados.golsBrasil && dados.golsBrasil["brasil_japao"]) {
-                        document.getElementById('gol_brasil').value = dados.golsBrasil["brasil_japao"];
-                    }
 
                     document.getElementById('login-screen').classList.remove('active');
                     document.getElementById('games-screen').classList.add('active');
@@ -159,17 +144,15 @@
             const cel = localStorage.getItem('bolao_user_celular');
             const p1 = document.getElementById('placar_brasil').value;
             const p2 = document.getElementById('placar_japao').value;
-            const gol = document.getElementById('gol_brasil').value;
 
-            if(p1 === "" || p2 === "" || !gol) {
-                return alert("Preencha o placar do jogo e escolha o autor do 1º gol!");
+            if(p1 === "" || p2 === "") {
+                return alert("Preencha o placar do jogo!");
             }
 
             const placarCompleto = p1 + "x" + p2;
 
             db.collection("usuarios").doc(cel).set({
-                jogos: { "brasil_japao": placarCompleto },
-                golsBrasil: { "brasil_japao": gol }
+                jogos: { "brasil_japao": placarCompleto }
             }, {merge: true}).then(() => {
                 alert("Aposta salva com sucesso para Brasil x Japão!");
                 document.getElementById('pix-area').style.display = 'block';
