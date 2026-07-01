@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bolão Copa 2026 - Oitavas de Final 🏆</title>
+    <title>Bolão Copa 2026 - Próxima Fase 🏆</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -39,7 +39,7 @@
         
         <section id="login-screen" class="screen active">
             <h1 style="text-align: center; color: var(--primary);">Bolão Resenha 🏆</h1>
-            <p style="text-align: center; color: #aaa; margin-bottom: 20px;">Mata-Mata: Brasil x Japão!</p>
+            <p style="text-align: center; color: #aaa; margin-bottom: 20px;">Próximo Jogo: Brasil x Noruega!</p>
             <input type="text" id="login-nome" placeholder="Seu Nome">
             <input type="tel" id="login-celular" placeholder="Celular (Ex: 75992637960)">
             <input type="text" id="login-apelido" placeholder="Seu Apelido">
@@ -56,8 +56,8 @@
                     <span>🇧🇷 Brasil</span>
                     <input type="number" id="admin_brasil" min="0" placeholder="0">
                     <span>X</span>
-                    <input type="number" id="admin_japao" min="0" placeholder="0">
-                    <span>🇯🇵 Japão</span>
+                    <input type="number" id="admin_noruega" min="0" placeholder="0">
+                    <span>🇳🇴 Noruega</span>
                 </div>
                 <button class="btn-master" style="background:red; color:white; font-size:1em;" onclick="salvarResultadoOficial()">Salvar Placar Oficial</button>
             </div>
@@ -68,7 +68,7 @@
                 <select id="master-champion-select">
                     <option value="">Escolha a seleção campeã...</option>
                     <option value="Brasil">🇧🇷 Brasil</option>
-                    <option value="Japão">🇯🇵 Japão</option>
+                    <option value="Noruega">🇳🇴 Noruega</option>
                     <option value="Argentina">🇦🇷 Argentina</option>
                     <option value="França">🇫🇷 França</option>
                     <option value="Alemanha">🇩🇪 Alemanha</option>
@@ -80,13 +80,13 @@
             </div>
 
             <div class="match-card" id="card-jogo">
-                <div class="match-date">⏰ SEGUNDA-FEIRA - OITAVAS DE FINAL</div>
+                <div class="match-date">⏰ DOMINGO às 17:00 - FASE DECISIVA</div>
                 <div class="match-row">
                     <span>🇧🇷 Brasil</span>
                     <input type="number" id="placar_brasil" min="0" placeholder="0">
                     <span>X</span>
-                    <input type="number" id="placar_japao" min="0" placeholder="0">
-                    <span>🇯🇵 Japão</span>
+                    <input type="number" id="placar_noruega" min="0" placeholder="0">
+                    <span>🇳🇴 Noruega</span>
                 </div>
                 
                 <button class="btn-master" id="btn-salvar-jogo" onclick="salvarJogoUnico()">⚽ SALVAR PALPITE (R$ 10,00)</button>
@@ -133,13 +133,11 @@
             const salvo = localStorage.getItem('bolao_user_celular');
             if(!salvo) return;
             
-            // Primeiro, busca se já tem resultado oficial lançado
             db.collection("sistema").doc("resultados").get().then(docSist => {
-                if(docSist.exists && docSist.data()["brasil_japao"]) {
-                    resultadoOficial = docSist.data()["brasil_japao"];
+                if(docSist.exists && docSist.data()["brasil_noruega"]) {
+                    resultadoOficial = docSist.data()["brasil_noruega"];
                 }
                 
-                // Depois, busca os dados do usuário logado
                 db.collection("usuarios").doc(salvo).get().then(doc => {
                     if(doc.exists) {
                         const dados = doc.data();
@@ -150,11 +148,11 @@
                         }
                         
                         let apostaFeita = null;
-                        if(dados.jogos && dados.jogos["brasil_japao"]) {
-                            apostaFeita = dados.jogos["brasil_japao"];
+                        if(dados.jogos && dados.jogos["brasil_noruega"]) {
+                            apostaFeita = dados.jogos["brasil_noruega"];
                             let partes = apostaFeita.split('x');
                             document.getElementById('placar_brasil').value = partes[0];
-                            document.getElementById('placar_japao').value = partes[1];
+                            document.getElementById('placar_noruega').value = partes[1];
                             document.getElementById('btn-salvar-jogo').innerText = "✏️ Alterar Aposta";
                         }
 
@@ -162,7 +160,6 @@
                             document.getElementById('admin-panel').style.display = 'block';
                         }
                         
-                        // Lógica visual de Acerto ou Erro
                         if (resultadoOficial) {
                             let card = document.getElementById('card-jogo');
                             let aviso = document.createElement('div');
@@ -171,7 +168,7 @@
                             aviso.style.fontWeight = "bold";
 
                             document.getElementById('placar_brasil').disabled = true;
-                            document.getElementById('placar_japao').disabled = true;
+                            document.getElementById('placar_noruega').disabled = true;
                             document.getElementById('btn-salvar-jogo').style.display = 'none';
 
                             if (apostaFeita) {
@@ -202,16 +199,16 @@
         function salvarJogoUnico() {
             const cel = localStorage.getItem('bolao_user_celular');
             const p1 = document.getElementById('placar_brasil').value;
-            const p2 = document.getElementById('placar_japao').value;
+            const p2 = document.getElementById('placar_noruega').value;
 
             if(p1 === "" || p2 === "") return alert("Preencha o placar do jogo!");
 
             const placarCompleto = p1 + "x" + p2;
 
             db.collection("usuarios").doc(cel).set({
-                jogos: { "brasil_japao": placarCompleto }
+                jogos: { "brasil_noruega": placarCompleto }
             }, {merge: true}).then(() => {
-                alert("Aposta salva com sucesso para Brasil x Japão!");
+                alert("Aposta salva com sucesso para Brasil x Noruega!");
                 document.getElementById('pix-area').style.display = 'block';
             });
         }
@@ -230,14 +227,14 @@
         
         function salvarResultadoOficial() {
             const p1 = document.getElementById('admin_brasil').value;
-            const p2 = document.getElementById('admin_japao').value;
+            const p2 = document.getElementById('admin_noruega').value;
 
             if(p1 === "" || p2 === "") return alert("Preencha o placar oficial!");
             
             if(confirm("Tem certeza que este é o placar final oficial?")) {
                 const placarCompleto = p1 + "x" + p2;
                 db.collection("sistema").doc("resultados").set({
-                    "brasil_japao": placarCompleto
+                    "brasil_noruega": placarCompleto
                 }, {merge: true}).then(() => {
                     alert("✅ Placar oficial salvo no sistema!");
                     location.reload();
